@@ -13,7 +13,7 @@ cfg_model_path = "models/best.pt"
 
 cfg_enable_url_download = True
 if cfg_enable_url_download:
-    url = "https://archive.org/download/yoloTrained/yoloTrained.pt" #Configure this if you set cfg_enable_url_download to True
+    url = "https://archive.org/download/bestweight_nulljoaheae/best.pt" #Configure this if you set cfg_enable_url_download to True
     cfg_model_path = f"models/{url.split('/')[-1:][0]}" #config model path from url name
 ## END OF CFG
 
@@ -23,8 +23,7 @@ st.set_page_config(
     page_title="NULL Joahae",
     layout="wide"
 )
-st.header("PCB Image Defect Finder")
-st.subheader("Input new Image 🖼️")
+
 
 
 def imageInput(device, src):
@@ -35,7 +34,7 @@ def imageInput(device, src):
                 if image_file is not None:
                         img=Image.open(image_file)
                         with col1:
-                                st.image(img,caption='이미지 삽입', use_column_width=True)
+                                st.image(img,caption='이미지 삽입', use_column_width='always')
                         ts=datetime.timestamp(datetime.now())
                         imgpath=os.path.join('data/uploads',str(ts)+image_file.name)
                         outputpath=os.path.join('data/outputs', os.path.basename(imgpath))
@@ -47,7 +46,7 @@ def imageInput(device, src):
                         pred=model(imgpath)
                         pred.render() # rendering bbox in image
                         for im in pred.ims:
-                                im_base64 =Image.fromarray # fromarray: numpy array to img file
+                                im_base64 =Image.fromarray(im) # fromarray: numpy array to img file
                                 im_base64.save(outputpath)
 
                         # -- Display--
@@ -57,9 +56,9 @@ def imageInput(device, src):
         
 
         elif src=='From dataset':
-                imgpath=glob.glob('data/images/*')
-                imgsel = st.slider('Select images from Data set.', min_value=1, max_value=len(imgpath), step=1) 
-                image_file = imgpath[imgsel-1]
+                test_images = os.listdir('data/images/')
+                test_image = st.selectbox('Please select a test image:', test_images)
+                image_file = 'data/images/' + test_image
                 submit = st.button(" predict!")
                 col1, col2 = st.columns(2)
                 with col1:
@@ -87,18 +86,16 @@ def main():
     else:
         deviceoption = st.sidebar.radio("Select compute Device.", ['cpu', 'cuda'], disabled = True, index=0)
     # -- End of Sidebar
-
+    st.header("PCB Image Defect Finder")
     st.subheader('👈🏽 왼쪽에서 옵션을 선택하세요!')
     st.sidebar.markdown("https://github.com/NULL-Joahae")
     imageInput(deviceoption, datasrc)
    
 
+if __name__ =='__main__':     
+    main()
 
-
-
-if __name__ =='__main__':
-                main()
-
+# Download Model from url
 @st.cache
 def loadModel():
       start_dl=time.time()
