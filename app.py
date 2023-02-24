@@ -42,6 +42,7 @@ def imageInput(device, src):
                                 f.write(image_file.getbuffer())
 
                         model=torch.hub.load('ultralytics/yolov5','custom',path='models/best.pt',force_reload=True)
+                        model.conf = 0.5
                         model.cuda() if device=='cuda'else model.cpu()
                         pred=model(imgpath)
                         pred.render() # rendering bbox in image
@@ -67,6 +68,7 @@ def imageInput(device, src):
                 with col2:            
                     if image_file is not None and submit:
                         model = torch.hub.load('ultralytics/yolov5', 'custom', path='models/best.pt', force_reload=True) 
+                        model.conf = 0.5
                         pred = model(image_file)
                         pred.render()  # render bbox in image
                         for im in pred.ims:
